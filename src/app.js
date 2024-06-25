@@ -19,6 +19,7 @@ import viewsRouter from "./routes/views.routes.js";
 import sessionRouter from "./routes/sessions.routes.js";
 import initializePassport from "./config/passport.config.js";
 import userRouter from "./routes/users.routes.js";
+import manejadorError from "./middleware/error.js";
 
 // import ChatManager from "./manager/ChatManager.js";
 import ChatController from "./controllers/chats.controller.js";
@@ -74,6 +75,9 @@ app.use("/", viewsRouter);
 app.use("/api/sessions", sessionRouter);
 app.use("/api/users", userRouter);
 
+//Middleware de Errores
+app.use(manejadorError);
+
 
 //Servidor
 const httpServer = app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
@@ -97,7 +101,12 @@ io.on("connection", async (socket) => {
     });
 
     socket.on("addForForm", async (data) => {
-        const resultado = await productController.createProductRealTime(data);
+        let resultado = await productController.createProductRealTime(data);
+        if(resultado) {
+            resultado = `${resultado.title}, se agrego a tus productos!`
+        } else {
+            resultado= "Producto incompleto"
+        }
         socket.emit("listProduct", await productController.getProductsRealTime());
         socket.emit("resultado", resultado); //Aplicar la respuesta para mostrar en pantalla.-
     });

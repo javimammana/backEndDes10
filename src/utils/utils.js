@@ -1,3 +1,5 @@
+import { faker } from "@faker-js/faker";
+
 export function validate (req, res, next) {
     const {title, description, price, code, stock, category} = req.body;
     
@@ -77,6 +79,28 @@ export function adminLoginJWT (req, res, next) {
         }
     }
     next();
+}
+
+
+
+
+let code = 0;
+export const generarProductos = () => {
+
+    code ++;
+
+    return {
+        _id: faker.database.mongodbObjectId(),
+        title: faker.commerce.productName(),
+        description: faker.commerce.productDescription(),
+        price: parseFloat(faker.commerce.price()).toFixed(2),
+        img: "sinImg.png",
+        thumbnail: [],
+        status: true,
+        category: faker.commerce.product().toUpperCase(),
+        stock: Number(faker.string.numeric()),
+        code: `PRO${code}`,
+    }
 }
 
 const checkRole = (roles) => async (req, res, next) => {

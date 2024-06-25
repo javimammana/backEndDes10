@@ -45,6 +45,17 @@ class ProductRepository {
         }
     }
 
+    async getProductByCode (code) {
+        try {
+            const product = await productDao.getProductByCode(code);
+            return product;
+        } catch (error) {
+            console.log ("(REPOSITORY) Error al obtener producto", error);
+            return false
+            // throw new Error ("(REPOSITORY) Error al obtener producto", error);
+        }
+    }
+
     async deleteProduct (id) {
         try {
             await productDao.deleteProduct(id);

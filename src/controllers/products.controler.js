@@ -1,17 +1,43 @@
 import { productServices } from "../services/services.js";
+import CustomError from "../services/errors/custom-error.js";
+import { EErrors } from "../services/errors/enum.js";
+import { infoErrorCode, infoErrorItem, infoErrorProducto } from "../services/errors/info.js";
 
 class ProductController {
 
-    async createProduct (req, res) {
-        const newProduct = {
-            ...req.body,
-            img: req.body.img || "sinImg.png"
-        };
+    async createProduct (req, res, next) {
+        const {title, description, price, code, stock, category} = req.body;
+
         try {
+            if( !title || !description || !price || !code || !stock || !category ) {
+                throw CustomError.crearError({
+                    nombre: "Producto Incompleto",
+                    causa: infoErrorProducto({title, description, price, code, stock, category}),
+                    mensaje: "Error al crear producto",
+                    codigo: EErrors.TIPO_INVALIDO
+                })
+            } 
+
+            const prodCode = await productServices.getProductByCode({code: code});
+
+            if (prodCode) {
+                throw CustomError.crearError({
+                    nombre: "CODE existente",
+                    causa: infoErrorCode(prodCode.code),
+                    mensaje: "El codigo ingresado ya existe con otro producto",
+                    codigo: EErrors.INFORMACION_REPETIDA
+                })
+            }
+
+            const newProduct = {
+                ...req.body,
+                img: req.body.img || "sinImg.png"
+            };
+
             const product = await productServices.createProduct(newProduct);
             res.json(product);
         } catch (error) {
-            res.status(500).json({error: error.message});
+            next(error);
         }
     }
 
@@ -74,14 +100,43 @@ class ProductController {
         }
     }
 
-    async updateProduct (req, res) {
+    async updateProduct (req, res, next) {
         const { pid } = req.params;
-        const updateProduct = req.body;
+        const {title, description, price, stock, category} = req.body;
+
         try {
-            const product = await productServices.updateProduct(pid, updateProduct);
+            const product = await productServices.getProductById(pid);
+
+            if (!product) {
+                throw CustomError.crearError({
+                    nombre: "Producto inexistente",
+                    causa: infoErrorItem(pid),
+                    mensaje: "El prodcuto no existe",
+                    codigo: EErrors.ITEM_INVALIDO
+                })
+            }
+
+            const code = product.code
+
+            if( !title || !description || !price || !code || !stock || !category ) {
+                throw CustomError.crearError({
+                    nombre: "Producto Incompleto",
+                    causa: infoErrorProducto({title, description, price, code, stock, category}),
+                    mensaje: "Error al crear producto",
+                    codigo: EErrors.TIPO_INVALIDO
+                })
+            } 
+
+            const updateProduct = {
+                ...req.body,
+                code: code,
+                img: req.body.img || "sinImg.png"
+            };
+
+            await productServices.updateProduct(pid, updateProduct);
             res.json(product);
         } catch (error) {
-            res.status(500).json({error: error.message});
+            next(error);
         }
     }
 
@@ -106,8 +161,9 @@ class ProductController {
 
     async createProductRealTime (data) {
         try {
-            await productServices.createProduct(data);
-            return "Producto creado"
+            const product = await productServices.createProduct(data);
+            console.log(product)
+            return product
         } catch (error) {
             console.log(error)
             throw new Error ("(CONTROLLER) Error al crear productosRealTime");

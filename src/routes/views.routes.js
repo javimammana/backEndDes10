@@ -24,5 +24,7 @@ router.get("/register", viewController.viewRegister);
 router.get("/profile", passport.authenticate("jwt", {session: false, failureRedirect: "/login"}), viewController.viewProfile);
 router.get("/restricted", passport.authenticate("jwt", {session: false, failureRedirect: "/login"}), viewController.viewRestricted);
 
+router.get("/mockingproducts", viewController.mockingproducts)
+
 
 export default router;

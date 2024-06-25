@@ -2,6 +2,7 @@ import { productServices, userServices } from "../services/services.js";
 import { cartServices } from "../services/services.js";
 import { chatServices } from "../services/services.js";
 import { ticketServices } from "../services/services.js";
+import { generarProductos } from "../utils/utils.js";
 
 // import configObject from "../config/configEnv.js";
 
@@ -322,6 +323,16 @@ class ViewController {
             
         }
 
+    }
+
+    mockingproducts (req, res) {
+            //Generamos un array de usuarios: 
+        const productos = []; 
+        for (let i = 0; i < 100; i++) {
+            productos.push(generarProductos()); 
+        }
+
+        res.send(productos);
     }
 }
 

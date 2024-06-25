@@ -41,14 +41,15 @@ class ProductDao {
         } catch (error) {
             throw new Error ("(DAO) Error al obtener producto");
         }
+    }
 
-        // try {
-        //     const product = await ProductModel.findById(id);
-        //     return product;
-
-        // } catch (error) {
-        //     throw new Error ("(DAO) Error al obtener producto");
-        // }
+    async getProductByCode (code) {
+        try {
+            const product = await ProductModel.findOne(code);
+            return product;
+        } catch (error) {
+            
+        }
     }
 
     async deleteProduct (id) {

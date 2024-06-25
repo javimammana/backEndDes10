@@ -7,8 +7,8 @@ const productController = new ProductController();
 
 router.get("/", productController.getProductsPaginate);
 router.get("/:pid", productController.getProductById)
-router.post("/",validate, productController.createProduct);
-router.put("/:pid",validate, productController.updateProduct);
+router.post("/", productController.createProduct);
+router.put("/:pid", productController.updateProduct);
 router.delete("/:pid", productController.deleteProduct);
 
 export default router;
